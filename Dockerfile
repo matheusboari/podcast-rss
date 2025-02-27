@@ -8,7 +8,7 @@ RUN yarn install --frozen-lockfile
 
 COPY . .
 
-RUN npx prisma generate && npx prisma migrate deploy
+RUN npx prisma generate
 RUN yarn build
 
 FROM node:18-alpine as production
@@ -23,5 +23,7 @@ RUN yarn install --frozen-lockfile
 
 COPY --from=development /usr/src/app/dist ./dist
 COPY --from=development /usr/src/app/prisma ./prisma
+
+RUN npx prisma migrate deploy
 
 CMD ["node", "dist/server.js"]
