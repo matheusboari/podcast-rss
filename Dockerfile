@@ -19,11 +19,10 @@ ENV NODE_ENV=production
 
 COPY package.json yarn.lock ./
 
-RUN yarn install --frozen-lockfile
+RUN yarn install --production --frozen-lockfile
 
 COPY --from=development /usr/src/app/dist ./dist
 COPY --from=development /usr/src/app/prisma ./prisma
+COPY --from=development /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 
-RUN npx prisma migrate deploy
-
-CMD ["node", "dist/server.js"]
+CMD ["sh", "-c", "yarn db:deploy && node dist/server.js"]

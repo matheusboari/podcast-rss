@@ -8,7 +8,8 @@
     "build": "tsc",
     "prestart": "yarn build",
     "start": "node dist/server.js",
-    "lint": "yarn eslint \"./**/*.ts\" --max-warnings=0"
+    "lint": "yarn eslint \"./**/*.ts\" --max-warnings=0",
+    "db:deploy": "npx prisma migrate deploy && npx prisma generate"
   },
   "dependencies": {
     "@prisma/client": "6.4.1",
