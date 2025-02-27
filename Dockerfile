@@ -2,6 +2,8 @@ FROM node:18-alpine as development
 
 WORKDIR /usr/src/app
 
+RUN apk add --no-cache yt-dlp ffmpeg
+
 COPY package.json yarn.lock ./
 
 RUN yarn install --frozen-lockfile
@@ -16,6 +18,8 @@ FROM node:18-alpine as production
 WORKDIR /usr/src/app
 
 ENV NODE_ENV=production
+
+RUN apk add --no-cache yt-dlp ffmpeg
 
 COPY package.json yarn.lock ./
 
