@@ -34,7 +34,6 @@ class YoutubeService {
           const data = stdout.trim().split("|");
           const [title, description] = data
           const pubDate = stdout.trim().split("|")[data.length - 1];
-          console.log({pubDate});
           resolve({
             title,
             description,
