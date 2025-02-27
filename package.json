@@ -5,8 +5,9 @@
   "license": "MIT",
   "scripts": {
     "dev": "ts-node-dev --inspect=0.0.0.0:5859 --respawn --transpile-only --project tsconfig.json --exit-child ./src/server.ts",
-    "start": "node dist/index.js",
     "build": "tsc",
+    "prestart": "yarn build",
+    "start": "node dist/server.js",
     "lint": "yarn eslint \"./**/*.ts\" --max-warnings=0"
   },
   "dependencies": {
