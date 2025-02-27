@@ -1,36 +1,27 @@
-FROM node:12.22-alpine as development
+FROM node:18-alpine as development
 
 WORKDIR /usr/src/app
 
-COPY package*.json yarn.lock ./
+COPY package.json yarn.lock ./
 
-# generated prisma files
-COPY prisma ./prisma/
-
-RUN yarn cache clean
 RUN yarn install --frozen-lockfile
 
 COPY . .
 
+RUN npx prisma generate
 RUN yarn build
 
-FROM node:12.22-alpine as production
-
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
+FROM node:18-alpine as production
 
 WORKDIR /usr/src/app
 
-COPY package*.json yarn.lock ./
+ENV NODE_ENV=production
 
-# generated prisma files
-COPY prisma ./prisma/
+COPY package.json yarn.lock ./
 
-RUN yarn cache clean
-RUN yarn install --only=production --frozen-lockfile
-
-COPY . .
+RUN yarn install --production --frozen-lockfile
 
 COPY --from=development /usr/src/app/dist ./dist
+COPY --from=development /usr/src/app/prisma ./prisma
 
-CMD ["node", "dist/src/main"]
+CMD ["node", "dist/server.js"]
