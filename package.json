@@ -4,11 +4,14 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node-dev --inspect=0.0.0.0:5859 --respawn --transpile-only --project tsconfig.json --exit-child ./src/index.ts",
+    "dev": "ts-node-dev --inspect=0.0.0.0:5859 --respawn --transpile-only --project tsconfig.json --exit-child ./src/server.ts",
     "start": "node dist/index.js",
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "yarn eslint \"./**/*.ts\" --max-warnings=0"
   },
   "dependencies": {
+    "@prisma/client": "6.4.1",
+    "cloudinary": "^2.5.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -16,9 +19,15 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
+    "@types/debug": "^4.1.12",
     "@types/express": "^5.0.0",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.13.5",
+    "@typescript-eslint/eslint-plugin": "^5.59.8",
+    "@typescript-eslint/parser": "^5.59.8",
+    "eslint": "^8.41.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "nodemon": "^3.1.9",
     "prisma": "^6.4.1",
     "ts-node": "^10.9.2",

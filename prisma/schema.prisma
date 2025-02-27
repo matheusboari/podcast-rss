@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Episode {
+  id          String   @id @default(uuid())
+  videoUrl    String
+  title       String
+  description String
+  audioUrl    String
+  pubDate     DateTime
+}
