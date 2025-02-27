@@ -1,6 +1,6 @@
 import express from 'express';
+import cors from "cors";
 
-import allowCors from './app/middlewares/allowCors';
 import routes from './app/routes';
 
 class App {
@@ -14,8 +14,12 @@ class App {
   }
 
   private middlewares(): void {
-    this.server.use(allowCors);
-    this.server.use(express.json({ limit: '50mb' }));
+    this.server.use(cors({
+      origin: "*",
+      methods: ["GET", "POST", "PUT", "DELETE"],
+      allowedHeaders: ["Content-Type", "Authorization"]
+    }));
+    this.server.use(express.json());
     this.server.use(express.urlencoded({ extended: true }));
   }
 
