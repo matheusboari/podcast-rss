@@ -8,12 +8,12 @@
   },
   "scripts": {
     "dev": "ts-node-dev --inspect=0.0.0.0:5859 --respawn --transpile-only --project tsconfig.json --exit-child ./src/server.ts",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.json",
     "prestart": "yarn build",
     "start": "node index.js",
     "lint": "yarn eslint \"./**/*.ts\" --max-warnings=0",
     "db:deploy": "npx prisma migrate deploy && npx prisma generate",
-    "vercel-build": "prisma generate && tsc"
+    "vercel-build": "node vercel.build.js"
   },
   "dependencies": {
     "@prisma/client": "6.4.1",

@@ -13,4 +13,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Exportar o app para ser usado pelo Vercel
+export default app;
 module.exports = app;
+module.exports.default = app;
