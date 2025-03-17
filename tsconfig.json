@@ -11,7 +11,7 @@
     "skipLibCheck": true,
     "removeComments": true,
     "noImplicitAny": true,
-    "noEmitOnError": true,
+    "noEmitOnError": false,
     "importHelpers": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
