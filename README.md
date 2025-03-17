@@ -51,7 +51,7 @@ RSS_LANGUAGE=pt-br
 Se você estiver enfrentando erro 404 em todas as rotas, verifique os seguintes pontos:
 
 1. Certifique-se de que o arquivo `vercel.json` está configurado corretamente:
-   - As rotas devem apontar para o arquivo correto
+   - As rotas devem apontar para o arquivo correto (use `/dist/server.js` em vez de `dist/server.js`)
    - O endpoint de cron deve estar configurado corretamente
 
 2. Verifique se as variáveis de ambiente estão configuradas corretamente no dashboard da Vercel
@@ -60,7 +60,21 @@ Se você estiver enfrentando erro 404 em todas as rotas, verifique os seguintes 
    - O script `vercel-build` deve estar configurado no `package.json`
    - O Prisma deve estar gerando o cliente corretamente
 
-4. Verifique os logs de deploy e runtime na Vercel para identificar possíveis erros
+4. Use a página de debug para testar as rotas: `/debug`
+
+5. Verifique os logs de deploy e runtime na Vercel para identificar possíveis erros
+
+### Solução para o erro 401 (Unauthorized)
+
+Se você estiver enfrentando erro 401 ao acessar as rotas, verifique os seguintes pontos:
+
+1. As rotas POST (`/add-episode` e `/update-episodes`) requerem autenticação
+   - Para fins de teste, o middleware de autenticação foi configurado para permitir acesso sem autenticação
+   - Em produção, você deve implementar uma autenticação adequada
+
+2. As rotas GET (`/episodes`, `/rss`, `/api/cron`, `/health`, `/test`) são públicas e não requerem autenticação
+
+3. Se você estiver usando o Postman, certifique-se de que está usando o método HTTP correto (GET ou POST)
 
 ### Configuração do Cron Job
 

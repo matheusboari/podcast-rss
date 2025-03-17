@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug - Devocionalmente Podcast</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1, h2 {
+      color: #333;
+    }
+    .endpoint {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .endpoint h3 {
+      margin-top: 0;
+    }
+    .response {
+      background-color: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      font-family: monospace;
+      margin-top: 10px;
+      min-height: 100px;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>Debug - Devocionalmente Podcast</h1>
+  <p>Esta página ajuda a depurar problemas com a API.</p>
+  
+  <div class="endpoint">
+    <h3>Teste Básico</h3>
+    <button onclick="testEndpoint('/api/test')">Testar</button>
+    <div id="test-response" class="response"></div>
+  </div>
+  
+  <div class="endpoint">
+    <h3>Health Check</h3>
+    <button onclick="testEndpoint('/api/v1/health')">Testar</button>
+    <div id="health-response" class="response"></div>
+  </div>
+  
+  <div class="endpoint">
+    <h3>Listar Episódios</h3>
+    <button onclick="testEndpoint('/api/v1/episodes')">Testar</button>
+    <div id="episodes-response" class="response"></div>
+  </div>
+  
+  <div class="endpoint">
+    <h3>Feed RSS</h3>
+    <button onclick="testEndpoint('/api/v1/rss')">Testar</button>
+    <div id="rss-response" class="response"></div>
+  </div>
+  
+  <script>
+    async function testEndpoint(url) {
+      const responseId = url.replace(/\//g, '-').substring(1) + '-response';
+      const responseElement = document.getElementById(responseId);
+      
+      responseElement.textContent = 'Carregando...';
+      
+      try {
+        const response = await fetch(url);
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          responseElement.textContent = JSON.stringify(data, null, 2);
+        } else {
+          const text = await response.text();
+          responseElement.textContent = text.substring(0, 500) + (text.length > 500 ? '...' : '');
+        }
+      } catch (error) {
+        responseElement.textContent = `Erro: ${error.message}`;
+      }
+    }
+  </script>
+</body>
+</html> 

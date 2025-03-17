@@ -12,16 +12,20 @@
   ],
   "routes": [
     {
+      "src": "/api/test",
+      "dest": "/api/test.js"
+    },
+    {
       "src": "/api/cron",
       "dest": "/api/cron.js"
     },
     {
       "src": "/api/v1/(.*)",
-      "dest": "dist/server.js"
+      "dest": "/dist/server.js"
     },
     {
       "src": "/(.*)",
-      "dest": "dist/server.js"
+      "dest": "/dist/server.js"
     }
   ],
   "crons": [

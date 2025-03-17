@@ -30,6 +30,10 @@ class App {
       return res.sendFile(path.join(__dirname, '../public/index.html'));
     });
     
+    this.server.get('/debug', (req: Request, res: Response) => {
+      return res.sendFile(path.join(__dirname, '../public/debug.html'));
+    });
+    
     this.server.use('/api/v1', routes);
   }
 }
