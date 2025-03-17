@@ -20,4 +20,9 @@ export const {
   CLOUD_NAME,
   API_KEY,
   API_SECRET,
+  YOUTUBE_CHANNEL_ID,
+  RSS_TITLE,
+  RSS_DESCRIPTION,
+  RSS_LINK,
+  RSS_LANGUAGE,
 } = process.env;

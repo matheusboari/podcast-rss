@@ -1,7 +1,7 @@
 import { exec } from "child_process";
 import path from "path";
 
-import { DOWNLOAD_FOLDER_PATH } from "../../settings";
+import { DOWNLOAD_FOLDER_PATH, YOUTUBE_CHANNEL_ID } from "../../settings";
 
 class YoutubeService {
   async downloadAudioFromYouTube (videoUrl: string): Promise<string> {
@@ -42,6 +42,73 @@ class YoutubeService {
         }
       });
     })
+  }
+
+  extractChannelIdentifier(channelUrl: string): string {
+    if (!channelUrl) return "";
+    if (!channelUrl.includes("youtube.com") && !channelUrl.includes("youtu.be")) {
+      return channelUrl;
+    }
+
+    const regexPatterns = [
+      /youtube\.com\/channel\/([^\/\?]+)/,
+      /youtube\.com\/c\/([^\/\?]+)/,
+      /youtube\.com\/@([^\/\?]+)/
+    ];
+    
+    for (const regex of regexPatterns) {
+      const match = channelUrl.match(regex);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+
+    return channelUrl;
+  }
+
+  async getLatestLiveFromChannel(): Promise<string | null> {
+    return new Promise((resolve, reject) => {
+      if (!YOUTUBE_CHANNEL_ID) {
+        reject("ID do canal do YouTube não configurado");
+        return;
+      }
+
+      const channelIdentifier = this.extractChannelIdentifier(YOUTUBE_CHANNEL_ID);
+
+      let channelUrl;
+      if (channelIdentifier.startsWith("UC")) {
+        channelUrl = `https://www.youtube.com/channel/${channelIdentifier}`;
+      } else if (channelIdentifier.startsWith("@")) {
+        channelUrl = `https://www.youtube.com/${channelIdentifier}`;
+      } else {
+        channelUrl = `https://www.youtube.com/c/${channelIdentifier}`;
+      }
+
+      const command = `yt-dlp --flat-playlist --playlist-end 5 --get-id "${channelUrl}/videos"`;
+      
+      console.info("🔍 Buscando últimos vídeos do canal...");
+      console.info("🔗 URL do canal:", channelUrl);
+      
+      exec(command, (error, stdout) => {
+        if (error) {
+          console.error("❌ Erro ao buscar vídeos do canal:", error);
+          reject(error);
+          return;
+        }
+        
+        const videoIds = stdout.trim().split("\n").filter(id => id);
+        if (videoIds.length === 0) {
+          console.info("❌ Nenhum vídeo encontrado no canal");
+          resolve(null);
+          return;
+        }
+
+        const latestVideoId = videoIds[0];
+        const videoUrl = `https://www.youtube.com/watch?v=${latestVideoId}`;
+        console.info("✅ Último vídeo encontrado:", videoUrl);
+        resolve(videoUrl);
+      });
+    });
   }
 }
 
