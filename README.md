@@ -48,21 +48,69 @@ RSS_LANGUAGE=pt-br
 
 ### Solução para o erro 404 nas rotas
 
-Se você estiver enfrentando erro 404 em todas as rotas, verifique os seguintes pontos:
+Se você estiver enfrentando erro 404 em todas as rotas, siga estas etapas:
 
 1. Certifique-se de que o arquivo `vercel.json` está configurado corretamente:
-   - As rotas devem apontar para o arquivo correto (use `/dist/server.js` em vez de `dist/server.js`)
-   - O endpoint de cron deve estar configurado corretamente
+   ```json
+   {
+     "version": 2,
+     "builds": [
+       {
+         "src": "index.js",
+         "use": "@vercel/node"
+       }
+     ],
+     "routes": [
+       {
+         "src": "/(.*)",
+         "dest": "/"
+       }
+     ]
+   }
+   ```
 
-2. Verifique se as variáveis de ambiente estão configuradas corretamente no dashboard da Vercel
+2. Verifique se o arquivo `index.js` na raiz do projeto está configurado corretamente:
+   ```javascript
+   // Este arquivo serve como ponto de entrada alternativo
+   const app = require('./dist/server');
 
-3. Certifique-se de que o build está sendo gerado corretamente:
-   - O script `vercel-build` deve estar configurado no `package.json`
-   - O Prisma deve estar gerando o cliente corretamente
+   // Exportar o app para ser usado pelo Vercel
+   module.exports = app;
+   ```
 
-4. Use a página de debug para testar as rotas: `/debug`
+3. Certifique-se de que o arquivo `package.json` está configurado corretamente:
+   ```json
+   {
+     "name": "podcast-rss",
+     "version": "1.0.0",
+     "main": "index.js",
+     "engines": {
+       "node": "18.x"
+     },
+     "scripts": {
+       "dev": "ts-node-dev --inspect=0.0.0.0:5859 --respawn --transpile-only --project tsconfig.json --exit-child ./src/server.ts",
+       "build": "tsc",
+       "prestart": "yarn build",
+       "start": "node index.js",
+       "lint": "yarn eslint \"./**/*.ts\" --max-warnings=0",
+       "db:deploy": "npx prisma migrate deploy && npx prisma generate",
+       "vercel-build": "prisma generate && tsc"
+     }
+   }
+   ```
 
-5. Verifique os logs de deploy e runtime na Vercel para identificar possíveis erros
+4. Certifique-se de que o arquivo `src/server.ts` está exportando o app corretamente:
+   ```typescript
+   // Exportar o app para ser usado pelo Vercel
+   module.exports = app;
+   ```
+
+5. Após fazer essas alterações, faça o deploy novamente na Vercel.
+
+6. Se o problema persistir, tente as seguintes soluções:
+   - Remova o projeto da Vercel e importe novamente
+   - Verifique se o build está sendo gerado corretamente nos logs da Vercel
+   - Tente usar o comando `vercel --prod` para fazer o deploy diretamente pelo CLI
 
 ### Solução para o erro 401 (Unauthorized)
 

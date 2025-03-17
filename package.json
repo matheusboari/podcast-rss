@@ -3,11 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "dev": "ts-node-dev --inspect=0.0.0.0:5859 --respawn --transpile-only --project tsconfig.json --exit-child ./src/server.ts",
     "build": "tsc",
     "prestart": "yarn build",
-    "start": "node dist/server.js",
+    "start": "node index.js",
     "lint": "yarn eslint \"./**/*.ts\" --max-warnings=0",
     "db:deploy": "npx prisma migrate deploy && npx prisma generate",
     "vercel-build": "prisma generate && tsc"
