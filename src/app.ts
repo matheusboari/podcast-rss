@@ -1,5 +1,6 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from "cors";
+import path from "path";
 
 import routes from './app/routes';
 
@@ -21,9 +22,14 @@ class App {
     }));
     this.server.use(express.json());
     this.server.use(express.urlencoded({ extended: true }));
+    this.server.use(express.static(path.join(__dirname, '../public')));
   }
 
   private routes(): void {
+    this.server.get('/', (req: Request, res: Response) => {
+      return res.sendFile(path.join(__dirname, '../public/index.html'));
+    });
+    
     this.server.use('/api/v1', routes);
   }
 }
