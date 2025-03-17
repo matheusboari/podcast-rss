@@ -17,7 +17,7 @@ router.get("/episodes", podcastController.listEpisodes as any);
 router.get("/rss", podcastController.getRss as any);
 router.get("/api/cron", podcastController.updateEpisodes as any);
 router.get("/health", healthCheck as any);
-router.get("/test", (req: any, res: any) => {
+router.get("/test", (_: any, res: any) => {
   return res.status(200).json({ 
     message: "API está funcionando corretamente",
     timestamp: new Date().toISOString()
