@@ -26,10 +26,6 @@ class App {
   }
 
   private routes(): void {
-    this.server.get('/', (req: Request, res: Response) => {
-      return res.sendFile(path.join(__dirname, '../public/index.html'));
-    });
-
     this.server.use('/api/v1', routes);
   }
 }

@@ -2,10 +2,12 @@ import 'dotenv/config';
 import fs from "fs-extra";
 import path from "path";
 
-export const DOWNLOAD_FOLDER_PATH = path.resolve(__dirname, "..", "..", "..", "downloads");
+export const DOWNLOAD_FOLDER_PATH = process.env.NODE_ENV === 'production' 
+  ? '/tmp/downloads'  // Em produção, usa /tmp que é a única pasta gravável
+  : path.resolve(__dirname, "..", "..", "..", "downloads");
 
 if (!fs.existsSync(DOWNLOAD_FOLDER_PATH)) {
-  fs.mkdirSync(DOWNLOAD_FOLDER_PATH);
+  fs.mkdirSync(DOWNLOAD_FOLDER_PATH, { recursive: true });
 }
 
 export const PORT = process.env.NODE_PORT || 3333;
