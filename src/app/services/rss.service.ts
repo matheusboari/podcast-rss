@@ -18,9 +18,9 @@ class RSSService {
           <description>${RSS_DESCRIPTION || 'Podcast Devocionalmente'}</description>
           <link>${RSS_LINK || 'https://devocionalmente.com.br'}</link>
           <image>
-            <url>https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/11373090/11373090-1605618437111-8b52e9f19e5a6.jpg</url>
-            <title>${RSS_TITLE || 'Devocionalmente Podcast'}</title>
-            <link>${RSS_LINK || 'https://devocionalmente.com.br'}</link>
+            <url>https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_nologo/41962962/41962962-1725491396851-6cd89cbe55eee.jpg</url>
+            <title>Devocionalmente</title>
+            <link>https://familiaabbachurch.com</link>
           </image>
           <generator>Devocionalmente Podcast Generator</generator>
           <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
@@ -43,20 +43,18 @@ class RSSService {
           ${episodes.map(episode => {
             const pubDate = new Date(episode.pubDate).toUTCString();
             const guid = episode.id;
-            
+
             return `
           <item>
-            <title><![CDATA[${episode.title}]]></title>
-            <description><![CDATA[${episode.description || 'Sem descrição'}]]></description>
-            <link>${episode.videoUrl}</link>
+            <title><![CDATA[${episode.title} ${episode.description}]]></title>
+            <link>${episode.audioUrl}</link>
             <guid isPermaLink="false">${guid}</guid>
+            <dc:creator><![CDATA[Família ABBA]]></dc:creator>
             <pubDate>${pubDate}</pubDate>
             <enclosure url="${episode.audioUrl}" length="0" type="audio/mpeg"/>
-            <itunes:title><![CDATA[${episode.title}]]></itunes:title>
-            <itunes:summary><![CDATA[${episode.description || 'Sem descrição'}]]></itunes:summary>
-            <itunes:explicit>false</itunes:explicit>
+            <itunes:explicit>No</itunes:explicit>
             <itunes:duration>00:00:00</itunes:duration>
-            <itunes:image href="https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/11373090/11373090-1605618437111-8b52e9f19e5a6.jpg"/>
+            <itunes:image href="https://d3t3ozftmdmh3i.cloudfront.net/staging/podcast_uploaded_nologo/41962962/41962962-1725491396851-6cd89cbe55eee.jpg"/>
             <itunes:episodeType>full</itunes:episodeType>
           </item>`;
           }).join('\n')}

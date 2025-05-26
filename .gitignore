@@ -1,5 +1,9 @@
 # files
 .env
+.env.local
+.env.development
+.env.test
+.env.production
 
 # compiled output
 /bin

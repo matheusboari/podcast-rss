@@ -23,11 +23,11 @@ class PodcastService {
 
       const episode = await prisma.episode.create({
         data: { 
-          title, 
-          videoUrl: normalizedUrl, 
-          description, 
-          audioUrl, 
-          pubDate 
+          title,
+          videoUrl: normalizedUrl,
+          description,
+          audioUrl,
+          pubDate
         },
       });
 
