@@ -1,8 +1,6 @@
 import { exec } from "child_process";
 import path from "path";
-import { google } from 'googleapis';
-
-import { DOWNLOAD_FOLDER_PATH, YOUTUBE_CHANNEL_ID, YOUTUBE_API_KEY } from "../../settings";
+import { DOWNLOAD_FOLDER_PATH, YOUTUBE_CHANNEL_ID } from "../../settings";
 
 interface VideoMetadata {
   videoId: string;
@@ -11,9 +9,7 @@ interface VideoMetadata {
 }
 
 class YoutubeService {
-  private youtube = google.youtube('v3');
-
-  async downloadAudioFromYouTube (videoUrl: string): Promise<string> {
+  async downloadAudioFromYouTube(videoUrl: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const outputFilePath = path.join(DOWNLOAD_FOLDER_PATH, `audio.mp3`);
   
@@ -30,7 +26,7 @@ class YoutubeService {
         }
       });
     });
-  };
+  }
 
   async getYouTubeMetadata(videoUrl: string): Promise<{ title: string; description: string; pubDate: string }> {
     return new Promise((resolve, reject) => {
@@ -41,7 +37,7 @@ class YoutubeService {
           reject(`Erro ao obter metadados: ${error.message}`);
         } else {
           const data = stdout.trim().split("|");
-          const [title, description] = data
+          const [title, description] = data;
           const pubDate = stdout.trim().split("|")[data.length - 1];
           resolve({
             title,
@@ -50,7 +46,7 @@ class YoutubeService {
           });
         }
       });
-    })
+    });
   }
 
   extractChannelIdentifier(channelUrl: string): string {
@@ -121,47 +117,32 @@ class YoutubeService {
   }
 
   async getChannelVideos(channelIdentifier: string): Promise<VideoMetadata[]> {
-    try {
-      // Primeiro, precisamos obter o ID do canal se for um nome de usuário
-      let channelId = channelIdentifier;
-      if (!channelIdentifier.startsWith('UC')) {
-        const response = await this.youtube.channels.list({
-          part: ['id'],
-          forUsername: channelIdentifier.replace('@', ''),
-          key: YOUTUBE_API_KEY
-        });
-
-        if (response.data.items && response.data.items.length > 0) {
-          channelId = response.data.items[0].id!;
-        } else {
-          throw new Error('Canal não encontrado');
+    return new Promise((resolve, reject) => {
+      const channelUrl = `https://www.youtube.com/${channelIdentifier}/videos`;
+      const command = `yt-dlp --flat-playlist --print "%(id)s|%(title)s|%(upload_date)s" "${channelUrl}"`;
+      
+      exec(command, (error, stdout) => {
+        if (error) {
+          console.error("❌ Erro ao buscar vídeos do canal:", error);
+          reject(error);
+          return;
         }
-      }
-
-      // Agora buscamos os vídeos do canal
-      const videosResponse = await this.youtube.search.list({
-        part: ['snippet'],
-        channelId: channelId,
-        order: 'date',
-        type: ['video'],
-        maxResults: 50,
-        key: YOUTUBE_API_KEY
+        
+        const videos = stdout.trim().split("\n")
+          .filter(line => line)
+          .map(line => {
+            const [videoId, title, uploadDate] = line.split("|");
+            return {
+              videoId,
+              title,
+              publishedAt: `${uploadDate.slice(0, 4)}-${uploadDate.slice(4, 6)}-${uploadDate.slice(6, 8)}T00:00:00Z`
+            };
+          });
+        
+        resolve(videos);
       });
-
-      if (!videosResponse.data.items) {
-        return [];
-      }
-
-      return videosResponse.data.items.map(item => ({
-        videoId: item.id!.videoId!,
-        title: item.snippet!.title!,
-        publishedAt: item.snippet!.publishedAt!
-      }));
-    } catch (error) {
-      console.error('Erro ao buscar vídeos do canal:', error);
-      throw error;
-    }
+    });
   }
 }
 
-export default new YoutubeService();
+export default new YoutubeService(); 

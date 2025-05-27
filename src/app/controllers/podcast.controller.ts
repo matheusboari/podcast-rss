@@ -1,9 +1,9 @@
 import podcastService from "../services/podcast.service";
 import rssService from "../services/rss.service";
 import { Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
 import { YOUTUBE_CHANNEL_ID } from "../../settings";
 import youtubeService from "../services/youtube.service";
-import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
