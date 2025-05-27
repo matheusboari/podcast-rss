@@ -93,8 +93,6 @@ Se você estiver enfrentando erro 404 em todas as rotas, siga estas etapas:
        "prestart": "yarn build",
        "start": "node index.js",
        "lint": "yarn eslint \"./**/*.ts\" --max-warnings=0",
-       "db:deploy": "npx prisma migrate deploy && npx prisma generate",
-       "vercel-build": "prisma generate && tsc"
      }
    }
    ```
