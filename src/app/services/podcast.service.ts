@@ -1,43 +1,35 @@
-import { Episode } from "@prisma/client";
+import Episode from '../../models/Episode';
 import audioUploaderService from "./audioUploader.service";
 import youtubeService from "./youtube.service";
 import { deleteFile } from "../utils/helper";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
 
 class PodcastService {
-  async addPodcast(videoUrl: string): Promise<Episode> {
-    try {
-      const normalizedUrl = this.normalizeYouTubeUrl(videoUrl);
-      const videoId = this.extractVideoId(normalizedUrl);
+  async addPodcast(videoUrl: string) {
+    const normalizedUrl = this.normalizeYouTubeUrl(videoUrl);
+    const videoId = this.extractVideoId(normalizedUrl);
 
-      const existingEpisode = await this.findEpisodeByVideoId(videoId);
-      if (existingEpisode) {
-        console.info("⚠️ Episódio já existe no banco de dados");
-        return existingEpisode;
-      }
-
-      const audioPath = await youtubeService.downloadAudioFromYouTube(normalizedUrl);
-      const audioUrl = await audioUploaderService.uploadAudioToCloudinary(audioPath);
-      const { title, description, pubDate } = await youtubeService.getYouTubeMetadata(normalizedUrl);
-
-      const episode = await prisma.episode.create({
-        data: { 
-          title,
-          videoUrl: normalizedUrl,
-          description,
-          audioUrl,
-          pubDate
-        },
-      });
-
-      deleteFile(audioPath);
-
-      return episode;
-    } catch(error) {
-      throw error;
+    const existingEpisode = await Episode.findOne({ videoUrl: normalizedUrl });
+    if (existingEpisode) {
+      console.info("⚠️ Episódio já existe no banco de dados");
+      return existingEpisode;
     }
+
+    const audioPath = await youtubeService.downloadAudioFromYouTube(normalizedUrl);
+    const audioUrl = await audioUploaderService.uploadAudioToCloudinary(audioPath);
+    const { title, description, pubDate } = await youtubeService.getYouTubeMetadata(normalizedUrl);
+
+    const episode = await Episode.create({
+      id: videoId,
+      title,
+      videoUrl: normalizedUrl,
+      description,
+      audioUrl,
+      pubDate
+    });
+
+    deleteFile(audioPath);
+
+    return episode;
   }
 
   extractVideoId(url: string): string {
@@ -52,23 +44,18 @@ class PodcastService {
     return `https://www.youtube.com/watch?v=${videoId}`;
   }
 
-  async findEpisodeByVideoId(videoId: string): Promise<Episode | null> {
+  async findEpisodeByVideoId(videoId: string) {
     if (!videoId) return null;
-    
     const normalizedUrl = `https://www.youtube.com/watch?v=${videoId}`;
-    return prisma.episode.findFirst({
-      where: {
-        videoUrl: normalizedUrl
-      }
-    });
+    return Episode.findOne({ videoUrl: normalizedUrl });
   }
 
-  async findEpisodeByVideoUrl(videoUrl: string): Promise<Episode | null> {
+  async findEpisodeByVideoUrl(videoUrl: string) {
     const videoId = this.extractVideoId(videoUrl);
     return this.findEpisodeByVideoId(videoId);
   }
 
-  async fetchAndAddLatestEpisode(): Promise<Episode | null> {
+  async fetchAndAddLatestEpisode() {
     try {
       console.info("🔄 Iniciando busca pelo último episódio...");
       const latestVideoUrl = await youtubeService.getLatestLiveFromChannel();
@@ -91,6 +78,10 @@ class PodcastService {
       console.error("❌ Erro ao buscar e adicionar último episódio:", error);
       throw error;
     }
+  }
+
+  async listAllEpisodes() {
+    return Episode.find().sort({ pubDate: -1 });
   }
 }
 

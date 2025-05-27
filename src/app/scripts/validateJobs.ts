@@ -1,14 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import cron from 'node-cron';
-
-const prisma = new PrismaClient();
 
 async function validateJobs() {
   try {
-    // Validação do banco de dados
-    await prisma.$connect();
-    console.log('✅ Conexão com o banco de dados estabelecida com sucesso');
-
     // Validação das configurações do cron
     const cronExpressions = [
       '0 */6 * * *', // Exemplo de expressão cron
@@ -23,7 +16,7 @@ async function validateJobs() {
 
     // Validação das variáveis de ambiente necessárias
     const requiredEnvVars = [
-      'DATABASE_URL',
+      'MONGO_URL',
       'CLOUD_NAME',
       'API_KEY',
       'API_SECRET',
@@ -40,8 +33,6 @@ async function validateJobs() {
   } catch (error) {
     console.error('❌ Erro na validação dos jobs:', error);
     process.exit(1);
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
