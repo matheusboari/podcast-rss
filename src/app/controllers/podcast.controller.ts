@@ -66,9 +66,9 @@ class PodcastController {
       
       // Verificar quais vídeos já existem no banco
       const existingEpisodes = await podcastService.listAllEpisodes();
-      const existingVideoIds = existingEpisodes.map(ep => 
-        podcastService.extractVideoId(ep.videoUrl)
-      );
+      const existingVideoIds = existingEpisodes
+        .filter(ep => ep.videoUrl)
+        .map(ep => podcastService.extractVideoId(ep.videoUrl!));
       
       // Filtrar apenas os vídeos que não existem no banco
       const newVideos = filteredVideos.filter(video => 

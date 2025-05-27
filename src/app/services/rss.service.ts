@@ -35,7 +35,7 @@ class RSSService {
           </itunes:category>
           <itunes:image href="https://d3t3ozftmdmh3i.cloudfront.net/production/podcast_uploaded_nologo/11373090/11373090-1605618437111-8b52e9f19e5a6.jpg"/>
           ${episodes.map(episode => {
-            const pubDate = new Date(episode.pubDate).toUTCString();
+            const pubDate = new Date(episode.pubDate || new Date()).toUTCString();
             const guid = episode.id;
 
             return `
