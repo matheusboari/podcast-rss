@@ -1,11 +1,8 @@
 import podcastService from "../services/podcast.service";
 import rssService from "../services/rss.service";
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
 import { YOUTUBE_CHANNEL_ID } from "../../settings";
 import youtubeService from "../services/youtube.service";
-
-const prisma = new PrismaClient();
 
 class PodcastController {
   async addEpisode(req: Request, res: Response) {
@@ -68,7 +65,7 @@ class PodcastController {
       console.log(`🎯 Encontrados ${filteredVideos.length} livestreams desde ${targetDate.toDateString()}`);
       
       // Verificar quais vídeos já existem no banco
-      const existingEpisodes = await prisma.episode.findMany();
+      const existingEpisodes = await podcastService.listAllEpisodes();
       const existingVideoIds = existingEpisodes.map(ep => 
         podcastService.extractVideoId(ep.videoUrl)
       );
@@ -121,12 +118,7 @@ class PodcastController {
 
   async listEpisodes(_: Request, res: Response) {
     try {
-      const episodes = await prisma.episode.findMany({
-        orderBy: {
-          pubDate: 'desc'
-        }
-      });
-      
+      const episodes = await podcastService.listAllEpisodes();
       res.json({ 
         total: episodes.length,
         episodes: episodes.map(episode => ({
@@ -135,7 +127,7 @@ class PodcastController {
           videoUrl: episode.videoUrl,
           audioUrl: episode.audioUrl,
           pubDate: episode.pubDate,
-          videoId: podcastService.extractVideoId(episode.videoUrl)
+          videoId: episode.id
         }))
       });
     } catch (error) {

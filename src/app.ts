@@ -1,8 +1,15 @@
 import express, { Request, Response } from 'express';
 import cors from "cors";
 import path from "path";
-
+import mongoose from 'mongoose';
 import routes from './app/routes';
+import { ENV } from './settings';
+
+mongoose.connect(process.env.MONGO_URL as string).then(() => {
+  console.log('✅ Conectado ao MongoDB Atlas');
+}).catch((err) => {
+  console.error('❌ Erro ao conectar ao MongoDB Atlas:', err);
+});
 
 class App {
   public server: express.Express;
@@ -30,6 +37,4 @@ class App {
   }
 }
 
-const app = new App();
-
-export default app.server;
+export default new App().server;

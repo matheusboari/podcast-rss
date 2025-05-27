@@ -1,15 +1,9 @@
 import { RSS_TITLE, RSS_DESCRIPTION, RSS_LINK, RSS_LANGUAGE } from "../../settings";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import Episode from '../../models/Episode';
 
 class RSSService {
   async fetchRSSFeed() {
-    const episodes = await prisma.episode.findMany({
-      orderBy: {
-        pubDate: 'desc'
-      }
-    });
+    const episodes = await Episode.find().sort({ pubDate: -1 });
 
     const rss = `<?xml version="1.0" encoding="UTF-8"?>
       <rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
