@@ -11,9 +11,6 @@
   "build": {
     "env": {
       "NODE_ENV": "production"
-    },
-    "commands": {
-      "build": "npm run build && curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /tmp/yt-dlp && chmod +x /tmp/yt-dlp && mv /tmp/yt-dlp /usr/local/bin/yt-dlp"
     }
   },
   "crons": [
