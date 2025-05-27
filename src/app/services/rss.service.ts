@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
 import { RSS_TITLE, RSS_DESCRIPTION, RSS_LINK, RSS_LANGUAGE } from "../../settings";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 

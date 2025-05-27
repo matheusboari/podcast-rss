@@ -1,9 +1,18 @@
 import { exec } from "child_process";
 import path from "path";
+import { google } from 'googleapis';
 
-import { DOWNLOAD_FOLDER_PATH, YOUTUBE_CHANNEL_ID } from "../../settings";
+import { DOWNLOAD_FOLDER_PATH, YOUTUBE_CHANNEL_ID, YOUTUBE_API_KEY } from "../../settings";
+
+interface VideoMetadata {
+  videoId: string;
+  title: string;
+  publishedAt: string;
+}
 
 class YoutubeService {
+  private youtube = google.youtube('v3');
+
   async downloadAudioFromYouTube (videoUrl: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const outputFilePath = path.join(DOWNLOAD_FOLDER_PATH, `audio.mp3`);
@@ -109,6 +118,49 @@ class YoutubeService {
         resolve(videoUrl);
       });
     });
+  }
+
+  async getChannelVideos(channelIdentifier: string): Promise<VideoMetadata[]> {
+    try {
+      // Primeiro, precisamos obter o ID do canal se for um nome de usuário
+      let channelId = channelIdentifier;
+      if (!channelIdentifier.startsWith('UC')) {
+        const response = await this.youtube.channels.list({
+          part: ['id'],
+          forUsername: channelIdentifier.replace('@', ''),
+          key: YOUTUBE_API_KEY
+        });
+
+        if (response.data.items && response.data.items.length > 0) {
+          channelId = response.data.items[0].id!;
+        } else {
+          throw new Error('Canal não encontrado');
+        }
+      }
+
+      // Agora buscamos os vídeos do canal
+      const videosResponse = await this.youtube.search.list({
+        part: ['snippet'],
+        channelId: channelId,
+        order: 'date',
+        type: ['video'],
+        maxResults: 50,
+        key: YOUTUBE_API_KEY
+      });
+
+      if (!videosResponse.data.items) {
+        return [];
+      }
+
+      return videosResponse.data.items.map(item => ({
+        videoId: item.id!.videoId!,
+        title: item.snippet!.title!,
+        publishedAt: item.snippet!.publishedAt!
+      }));
+    } catch (error) {
+      console.error('Erro ao buscar vídeos do canal:', error);
+      throw error;
+    }
   }
 }
 

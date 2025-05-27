@@ -1,8 +1,8 @@
-import { Episode, PrismaClient } from "@prisma/client";
-
+import { Episode } from "@prisma/client";
 import audioUploaderService from "./audioUploader.service";
 import youtubeService from "./youtube.service";
 import { deleteFile } from "../utils/helper";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -10,8 +10,9 @@ class PodcastService {
   async addPodcast(videoUrl: string): Promise<Episode> {
     try {
       const normalizedUrl = this.normalizeYouTubeUrl(videoUrl);
+      const videoId = this.extractVideoId(normalizedUrl);
 
-      const existingEpisode = await this.findEpisodeByVideoId(this.extractVideoId(normalizedUrl));
+      const existingEpisode = await this.findEpisodeByVideoId(videoId);
       if (existingEpisode) {
         console.info("⚠️ Episódio já existe no banco de dados");
         return existingEpisode;
@@ -54,8 +55,12 @@ class PodcastService {
   async findEpisodeByVideoId(videoId: string): Promise<Episode | null> {
     if (!videoId) return null;
     
-    const episodes = await prisma.episode.findMany();
-    return episodes.find(episode => this.extractVideoId(episode.videoUrl) === videoId) || null;
+    const normalizedUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    return prisma.episode.findFirst({
+      where: {
+        videoUrl: normalizedUrl
+      }
+    });
   }
 
   async findEpisodeByVideoUrl(videoUrl: string): Promise<Episode | null> {
